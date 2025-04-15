@@ -6,50 +6,23 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>WhiskerBuddy</title>
   <link rel="stylesheet" href="style.css" />
-  <link rel="manifest" href="manifest.json" />
-  <meta name="theme-color" content="#6c63ff"/>
-  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
   <script type="module" src="script.js"></script>
 </head>
 <body>
   <div class="container">
-    <header>
-      <h1>WhiskerBuddy</h1>
-      <div id="userSection">
-        <button id="signInBtn"><i class="fas fa-sign-in-alt"></i> Sign in with Google</button>
-        <span id="userInfo"></span>
-        <button id="signOutBtn" style="display: none;">Sign out</button>
-      </div>
-      <button id="themeToggle"><i class="fas fa-adjust"></i></button>
-    </header>
-    <main>
-      <div class="pet-status">
-        <img id="petImg" src="https://cdn-icons-png.flaticon.com/512/616/616408.png" alt="Cat" />
-        <div class="mood" id="mood">Happy</div>
-      </div>
-      <div class="stats">
-        <div>Hunger: <span id="hunger">100</span></div>
-        <div>Energy: <span id="energy">100</span></div>
-        <div>Happiness: <span id="happiness">100</span></div>
-      </div>
-      <div class="actions">
-        <button id="feedBtn"><i class="fas fa-utensils"></i> Feed</button>
-        <button id="playBtn"><i class="fas fa-gamepad"></i> Play</button>
-        <button id="sleepBtn"><i class="fas fa-bed"></i> Sleep</button>
-      </div>
-      <div class="share">
-        <button id="createRoomBtn">Create Room</button>
-        <input id="roomInput" placeholder="Enter Room Code" />
-        <button id="joinRoomBtn">Join Room</button>
-        <div id="roomDisplay"></div>
-      </div>
-    </main>
+    <h1>WhiskerBuddy</h1>
+    <div id="authSection">
+      <button id="loginBtn">Login with Google</button>
+      <button id="logoutBtn" style="display:none;">Logout</button>
+    </div>
+    <div id="userInfo" style="display:none;">
+      <p id="userName"></p>
+      <p>Your Pet: <span id="petName">None</span></p>
+      <button id="setPetBtn">Set/Change Pet Name</button>
+    </div>
+    <div class="theme-toggle">
+      <button id="toggleThemeBtn">Toggle Theme</button>
+    </div>
   </div>
-  <script>
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('service-worker.js')
-        .then(() => console.log("Service Worker Registered"));
-    }
-  </script>
 </body>
 </html>

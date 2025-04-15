@@ -1,120 +1,143 @@
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-app.js";
-import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-database.js";
-import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-auth.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
+import {
+  getAuth,
+  signInWithPopup,
+  GoogleAuthProvider,
+  signOut
+} from "https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js";
+import {
+  getFirestore,
+  doc,
+  getDoc,
+  setDoc,
+  deleteDoc,
+  getDocs,
+  collection
+} from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
 
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_AUTH_DOMAIN",
-  projectId: "YOUR_PROJECT_ID",
-  databaseURL: "YOUR_DATABASE_URL",
-  storageBucket: "YOUR_STORAGE_BUCKET",
-  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-  appId: "YOUR_APP_ID"
+  apiKey: "AIzaSyDqbY5dfw8vPWuWt5mrkCL9tMs9PO25M2s",
+  authDomain: "petapp-7465c.firebaseapp.com",
+  projectId: "petapp-7465c",
+  storageBucket: "petapp-7465c.firebasestorage.app",
+  messagingSenderId: "473047245691",
+  appId: "1:473047245691:web:a4482cd12c91bc927053de",
+  measurementId: "G-XVHYWGYTT6"
 };
 
 const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
 const auth = getAuth(app);
+const db = getFirestore(app);
 const provider = new GoogleAuthProvider();
 
-let currentUser = null;
-let room = "default";
-let stats = { hunger: 100, energy: 100, happiness: 100 };
+const loginBtn = document.getElementById("loginBtn");
+const logoutBtn = document.getElementById("logoutBtn");
+const userInfo = document.getElementById("userInfo");
+const userName = document.getElementById("userName");
+const petName = document.getElementById("petName");
+const setPetBtn = document.getElementById("setPetBtn");
 
-const hungerEl = document.getElementById("hunger");
-const energyEl = document.getElementById("energy");
-const happinessEl = document.getElementById("happiness");
-const moodEl = document.getElementById("mood");
+const adminBanner = document.createElement("p");
+adminBanner.style.color = "red";
+adminBanner.textContent = "You are signed in as an ADMIN.";
 
-document.getElementById("feedBtn").onclick = () => updateStats({ hunger: +10 });
-document.getElementById("playBtn").onclick = () => updateStats({ happiness: +10, energy: -5 });
-document.getElementById("sleepBtn").onclick = () => updateStats({ energy: +15 });
+const adminPanel = document.createElement("div");
+adminPanel.id = "adminPanel";
+adminPanel.innerHTML = "<h3>Admin Panel</h3><div id='userList'></div>";
 
-document.getElementById("joinRoomBtn").onclick = () => {
-  const input = document.getElementById("roomInput").value.trim();
-  if (input) {
-    room = input;
-    listenToRoom();
-    document.getElementById("roomDisplay").textContent = "Joined Room: " + room;
-  }
-};
+loginBtn.onclick = async () => {
+  try {
+    const result = await signInWithPopup(auth, provider);
+    const user = result.user;
+    userName.textContent = "Hello, " + user.displayName;
 
-document.getElementById("createRoomBtn").onclick = () => {
-  room = Math.random().toString(36).substring(2, 8).toUpperCase();
-  set(ref(db, "rooms/" + room), stats);
-  listenToRoom();
-  document.getElementById("roomDisplay").textContent = "Created Room: " + room;
-};
+    loginBtn.style.display = "none";
+    logoutBtn.style.display = "inline";
+    userInfo.style.display = "block";
+    loadUserPet(user.uid);
 
-document.getElementById("themeToggle").onclick = () => {
-  document.body.classList.toggle("dark");
-};
-
-document.getElementById("signInBtn").onclick = () => {
-  signInWithPopup(auth, provider)
-    .then(result => {
-      currentUser = result.user;
-      updateUserUI();
-    });
-};
-
-document.getElementById("signOutBtn").onclick = () => {
-  signOut(auth).then(() => {
-    currentUser = null;
-    updateUserUI();
-  });
-};
-
-onAuthStateChanged(auth, (user) => {
-  currentUser = user;
-  updateUserUI();
-});
-
-function updateUserUI() {
-  const info = document.getElementById("userInfo");
-  const signOutBtn = document.getElementById("signOutBtn");
-  if (currentUser) {
-    info.textContent = "Hi, " + currentUser.displayName;
-    signOutBtn.style.display = "inline-block";
-  } else {
-    info.textContent = "";
-    signOutBtn.style.display = "none";
-  }
-}
-
-function updateStats(changes) {
-  for (const key in changes) {
-    stats[key] = Math.min(100, Math.max(0, stats[key] + changes[key]));
-  }
-  set(ref(db, "rooms/" + room), stats);
-  updateMood();
-}
-
-function listenToRoom() {
-  const statsRef = ref(db, "rooms/" + room);
-  onValue(statsRef, (snapshot) => {
-    const data = snapshot.val();
-    if (data) {
-      stats = data;
-      updateUI();
+    if (user.email === "sufiyxnn@gmail.com") {
+      userInfo.appendChild(adminBanner);
+      userInfo.appendChild(adminPanel);
+      loadAllPets();
     }
+  } catch (error) {
+    console.error("Login error:", error);
+  }
+};
+
+logoutBtn.onclick = async () => {
+  await signOut(auth);
+  userName.textContent = "";
+  petName.textContent = "None";
+  loginBtn.style.display = "inline";
+  logoutBtn.style.display = "none";
+  userInfo.style.display = "none";
+  if (userInfo.contains(adminBanner)) {
+    userInfo.removeChild(adminBanner);
+  }
+  if (userInfo.contains(adminPanel)) {
+    userInfo.removeChild(adminPanel);
+  }
+};
+
+setPetBtn.onclick = async () => {
+  const user = auth.currentUser;
+  if (user) {
+    const pet = prompt("Enter your pet's name:");
+    if (pet) {
+      await setDoc(doc(db, "pets", user.uid), { petName: pet, email: user.email, name: user.displayName || user.email });
+      petName.textContent = pet;
+    }
+  }
+};
+
+async function loadUserPet(uid) {
+  const docRef = doc(db, "pets", uid);
+  const docSnap = await getDoc(docRef);
+  if (docSnap.exists()) {
+    petName.textContent = docSnap.data().petName;
+  } else {
+    petName.textContent = "None";
+  }
+}
+
+async function loadAllPets() {
+  const userList = document.getElementById("userList");
+  userList.innerHTML = "<p>Loading all users with pets...</p>";
+  const querySnapshot = await getDocs(collection(db, "pets"));
+  let html = "<table border='1'><tr><th>Name</th><th>Email</th><th>Pet</th><th>Actions</th></tr>";
+
+  querySnapshot.forEach((docSnap) => {
+    const data = docSnap.data();
+    html += `<tr>
+      <td>\${data.name}</td>
+      <td>\${data.email}</td>
+      <td id="pet-\${docSnap.id}">\${data.petName}</td>
+      <td>
+        <button onclick="editPet('\${docSnap.id}', '\${data.petName}')">Edit</button>
+        <button onclick="deletePet('\${docSnap.id}')">Delete</button>
+      </td>
+    </tr>`;
   });
+
+  html += "</table>";
+  userList.innerHTML = html;
 }
 
-function updateUI() {
-  hungerEl.textContent = stats.hunger;
-  energyEl.textContent = stats.energy;
-  happinessEl.textContent = stats.happiness;
-  updateMood();
+window.editPet = async (uid, currentPet) => {
+  const newPet = prompt("Enter new pet name:", currentPet);
+  if (newPet) {
+    await setDoc(doc(db, "pets", uid), { petName: newPet }, { merge: true });
+    document.getElementById("pet-" + uid).textContent = newPet;
+  }
 }
 
-function updateMood() {
-  const { hunger, energy, happiness } = stats;
-  let mood = "Happy";
-  if (hunger < 30 || energy < 30 || happiness < 30) mood = "Sad";
-  if (hunger < 10 || energy < 10 || happiness < 10) mood = "Sick";
-  moodEl.textContent = mood;
+window.deletePet = async (uid) => {
+  const confirmDelete = confirm("Are you sure you want to delete this pet?");
+  if (confirmDelete) {
+    await deleteDoc(doc(db, "pets", uid));
+    loadAllPets();
+  }
 }
-
-listenToRoom();
