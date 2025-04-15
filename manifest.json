@@ -1,0 +1,21 @@
+
+{
+  "name": "WhiskerBuddy",
+  "short_name": "WhiskerBuddy",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#f0f0ff",
+  "theme_color": "#6c63ff",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/616/616408.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/616/616408.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

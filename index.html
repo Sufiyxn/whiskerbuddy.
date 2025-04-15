@@ -1,0 +1,48 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>WhiskerBuddy</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#6c63ff"/>
+  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+  <script type="module" src="script.js"></script>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>WhiskerBuddy</h1>
+      <button id="themeToggle"><i class="fas fa-adjust"></i></button>
+    </header>
+    <main>
+      <div class="pet-status">
+        <img id="petImg" src="https://cdn-icons-png.flaticon.com/512/616/616408.png" alt="Cat" />
+        <div class="mood" id="mood">Happy</div>
+      </div>
+      <div class="stats">
+        <div>Hunger: <span id="hunger">100</span></div>
+        <div>Energy: <span id="energy">100</span></div>
+        <div>Happiness: <span id="happiness">100</span></div>
+      </div>
+      <div class="actions">
+        <button id="feedBtn"><i class="fas fa-utensils"></i> Feed</button>
+        <button id="playBtn"><i class="fas fa-gamepad"></i> Play</button>
+        <button id="sleepBtn"><i class="fas fa-bed"></i> Sleep</button>
+      </div>
+      <div class="share">
+        <input id="roomInput" placeholder="Enter Room Code" />
+        <button id="joinRoomBtn">Join Room</button>
+      </div>
+    </main>
+  </div>
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('service-worker.js')
+        .then(() => console.log("Service Worker Registered"));
+    }
+  </script>
+</body>
+</html>

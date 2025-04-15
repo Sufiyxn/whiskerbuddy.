@@ -1,0 +1,59 @@
+
+:root {
+  --bg: #f0f0ff;
+  --text: #333;
+  --card: #fff;
+}
+body.dark {
+  --bg: #1c1c2b;
+  --text: #eee;
+  --card: #2c2c3d;
+}
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background-color: var(--bg);
+  color: var(--text);
+}
+.container {
+  max-width: 600px;
+  margin: auto;
+  padding: 20px;
+}
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.pet-status {
+  text-align: center;
+}
+.pet-status img {
+  width: 150px;
+}
+.mood {
+  font-size: 1.2em;
+  margin-top: 10px;
+}
+.stats {
+  display: flex;
+  justify-content: space-around;
+  margin: 20px 0;
+}
+.actions {
+  display: flex;
+  justify-content: space-around;
+}
+.actions button {
+  padding: 10px 15px;
+  font-size: 16px;
+  cursor: pointer;
+}
+.share {
+  margin-top: 20px;
+  text-align: center;
+}
+.share input {
+  padding: 5px;
+  width: 60%;
+}
