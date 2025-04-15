@@ -1,6 +1,7 @@
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-app.js";
-import { getDatabase, ref, set, get, onValue } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-database.js";
+import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-database.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-auth.js";
 
 const firebaseConfig = {
   apiKey: "YOUR_API_KEY",
@@ -14,7 +15,10 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
+const auth = getAuth(app);
+const provider = new GoogleAuthProvider();
 
+let currentUser = null;
 let room = "default";
 let stats = { hunger: 100, energy: 100, happiness: 100 };
 
@@ -32,12 +36,52 @@ document.getElementById("joinRoomBtn").onclick = () => {
   if (input) {
     room = input;
     listenToRoom();
+    document.getElementById("roomDisplay").textContent = "Joined Room: " + room;
   }
+};
+
+document.getElementById("createRoomBtn").onclick = () => {
+  room = Math.random().toString(36).substring(2, 8).toUpperCase();
+  set(ref(db, "rooms/" + room), stats);
+  listenToRoom();
+  document.getElementById("roomDisplay").textContent = "Created Room: " + room;
 };
 
 document.getElementById("themeToggle").onclick = () => {
   document.body.classList.toggle("dark");
 };
+
+document.getElementById("signInBtn").onclick = () => {
+  signInWithPopup(auth, provider)
+    .then(result => {
+      currentUser = result.user;
+      updateUserUI();
+    });
+};
+
+document.getElementById("signOutBtn").onclick = () => {
+  signOut(auth).then(() => {
+    currentUser = null;
+    updateUserUI();
+  });
+};
+
+onAuthStateChanged(auth, (user) => {
+  currentUser = user;
+  updateUserUI();
+});
+
+function updateUserUI() {
+  const info = document.getElementById("userInfo");
+  const signOutBtn = document.getElementById("signOutBtn");
+  if (currentUser) {
+    info.textContent = "Hi, " + currentUser.displayName;
+    signOutBtn.style.display = "inline-block";
+  } else {
+    info.textContent = "";
+    signOutBtn.style.display = "none";
+  }
+}
 
 function updateStats(changes) {
   for (const key in changes) {

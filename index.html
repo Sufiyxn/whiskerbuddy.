@@ -15,6 +15,11 @@
   <div class="container">
     <header>
       <h1>WhiskerBuddy</h1>
+      <div id="userSection">
+        <button id="signInBtn"><i class="fas fa-sign-in-alt"></i> Sign in with Google</button>
+        <span id="userInfo"></span>
+        <button id="signOutBtn" style="display: none;">Sign out</button>
+      </div>
       <button id="themeToggle"><i class="fas fa-adjust"></i></button>
     </header>
     <main>
@@ -33,8 +38,10 @@
         <button id="sleepBtn"><i class="fas fa-bed"></i> Sleep</button>
       </div>
       <div class="share">
+        <button id="createRoomBtn">Create Room</button>
         <input id="roomInput" placeholder="Enter Room Code" />
         <button id="joinRoomBtn">Join Room</button>
+        <div id="roomDisplay"></div>
       </div>
     </main>
   </div>
